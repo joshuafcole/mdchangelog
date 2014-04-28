@@ -1,0 +1,30 @@
+{
+  "name": "mdchangelog",
+  "version": "0.0.1",
+  "description": "markdown github changelog history",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "mdchangelog": "bin/mdchangelog"
+  },
+  "preferGlobal": true,
+  "author": "Matthew Hadley (https://github.com/diffsky)",
+  "license": "MIT",
+  "dependencies": {
+    "chaps": "^1.2.0",
+    "async": "^0.7.0",
+    "moment-timezone": "0.0.6",
+    "minimist": "0.0.8"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/creativelive/mdchangelog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/creativelive/mdchangelog/issues"
+  },
+  "homepage": "https://github.com/creativelive/mdchangelog"
+}
