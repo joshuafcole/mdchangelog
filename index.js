@@ -187,6 +187,7 @@ module.exports = function(){
                   closed: res.body.milestone.closed_issues,
                 },
                 state: res.body.milestone.state,
+                updated_at: res.body.milestone.updated_at
               };
               milestonesSummary[milestones[res.body.milestone.number].state]++;
               issues[item.key].milestone = milestones[res.body.milestone.number];
@@ -227,6 +228,9 @@ module.exports = function(){
     for(i in milestones){
       milestonesList.push(milestones[i]);
     }
+    milestonesList.sort(function(a, b){
+      return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
+    });
 
     // generate summary
     var startCommit = commits[0];
