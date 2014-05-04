@@ -4,6 +4,8 @@
 
 var util = require('util');
 var argv = require('minimist')(process.argv.slice(2));
+var fs = require('fs');
+var util = require('util');
 var MDchangelog = require('..');
 
 if(argv.version) {
@@ -26,26 +28,9 @@ if(!process.env.MDCHANGELOG_TOKEN){
 }
 var changelog = new MDchangelog();
 changelog(argv._[0], function(err, log){
-
   if(err) {
-    return util.puts(err);
+    return util.error(err);
   }
-  util.puts(log.summary.release);
-  util.puts(log.summary.desc);
-  util.puts('');
-  if(log.milestones.length){
-    util.puts('## Milestones');
-    util.puts(log.milestones.join('\n'));
-    util.puts('');
-  }
-  if(log.issues.length){
-    util.puts('### Issues');
-    util.puts(log.issues.join('\n'));
-    util.puts('');
-  }
-  if(log.commits.length && argv.commits) {
-    util.puts('### Commits');
-    util.puts(log.commits.join('\n'));
-    util.puts('');
-  }
+  fs.writeFileSync(process.cwd() + '/CHANGELOG.md', log);
+  util.puts('changelog written');
 });

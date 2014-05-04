@@ -12,13 +12,23 @@ var chaps = new Chaps({
     'User-Agent': 'chalog'
   }
 });
+var fs = require('fs');
 var moment = require('moment-timezone');
+var ejs = require('ejs');
+
+var tpl = fs.readFileSync(__dirname + '/log.ejs', 'utf8');
 
 module.exports = function(){
   var repo;
+  var revisionSelection = '';
+  var commits = [];
   var issues = {};
-  var contributors = {};
+  var orphanIssues = [];
   var milestones = {};
+  var contributors = {};
+  var existing = '';
+  var anchor;
+  var symbol = '⎆';
   var milestonesSummary = {
     open: 0,
     closed: 0
@@ -27,11 +37,20 @@ module.exports = function(){
     open: 0,
     closed: 0
   };
-  var commits = [];
-  var range;
 
-  function setRange(revisionSelection){
-    range = revisionSelection || '';
+  function setRevision(cb){
+    if(fs.existsSync('CHANGELOG.md')){
+      existing = fs.readFileSync(process.cwd() + '/CHANGELOG.md', 'utf8');
+      var regex = new RegExp('\\w+\\)' + symbol, 'g');
+      var match = regex.exec(existing);
+      if(match) {
+        anchor = match[0].substring(0, match[0].length -2);
+      }
+      if(anchor){
+        revisionSelection = 'HEAD...' + anchor;
+      }
+    }
+    return cb(null, anchor);
   }
 
   function parseRepo(cb){
@@ -56,7 +75,7 @@ module.exports = function(){
 
   function parseGitLog(cb) {
     var delim = '----******----';
-    var cmd = 'git log --pretty=format:"%H%n%h%n%ad%n%aN%n%s%n%B%n' + delim + '" --date=raw ' + range;
+    var cmd = 'git log --pretty=format:"%H%n%h%n%ad%n%aN%n%s%n%B%n' + delim + '" --date=raw ' + revisionSelection;
     var execOpts = {
       maxBuffer: 2000*1024,
       cwd: process.cwd()
@@ -68,7 +87,10 @@ module.exports = function(){
       if(stderr) {
         return cb(stderr);
       }
-      var line = 0;
+      if(stdout===''){
+        return cb('no changes');
+      }
+      // anatomy of a git log entry
       var entrySignature = [
         'sha',
         'shaAbbr',
@@ -78,8 +100,11 @@ module.exports = function(){
         'body'
       ];
       var entrySize = entrySignature.length -1;
-      var sha;
+
+      // build the list of commits from the git log
       var commit = {};
+      var sha;
+      var line = 0;
       stdout.split('\n').forEach(function(entry){
         if(entry === delim){
           line = 0;
@@ -87,6 +112,7 @@ module.exports = function(){
           if(commit[sha].body[commit[sha].body.length -1] === ''){
             commit[sha].body.pop();
           }
+          // add commit to list of commits
           commits.push(commit[sha]);
           commit = {};
         } else {
@@ -115,6 +141,7 @@ module.exports = function(){
         }
       });
 
+      // parse each commit for signs of a reference to a github issue
       commits.forEach(function(commit){
         var commitIssues = commit.body.join('\n').match(/[\w+\/\w+]*#[0-9]+/g);
         var issueData;
@@ -158,6 +185,7 @@ module.exports = function(){
     }
 
     async.eachLimit(issuesList, 20, function(item, asyncCb){
+
         chaps.get({
           url: '/repos/' + item.repo + '/issues/' + item.number
         }, function(err, res){
@@ -178,6 +206,7 @@ module.exports = function(){
             issues[item.key].updated_at = res.body.updated_at;
             issuesSummary[issues[item.key].state]++;
 
+
             if(res.body.milestone){
               milestones[res.body.milestone.number] = milestones[res.body.milestone.number] || {
                 number: res.body.milestone.number,
@@ -187,10 +216,14 @@ module.exports = function(){
                   closed: res.body.milestone.closed_issues,
                 },
                 state: res.body.milestone.state,
-                updated_at: res.body.milestone.updated_at
+                created_at: res.body.milestone.created_at
               };
+              milestones[res.body.milestone.number].issues.list = milestones[res.body.milestone.number].issues.list || [];
+              milestones[res.body.milestone.number].issues.list.push(issues[item.key]);
               milestonesSummary[milestones[res.body.milestone.number].state]++;
               issues[item.key].milestone = milestones[res.body.milestone.number];
+            } else {
+              orphanIssues.push(issues[item.key]);
             }
           } else {
             // non-existent issue referenced in a commit
@@ -205,17 +238,7 @@ module.exports = function(){
   }
 
   function writeLog(cb){
-    var log = {}, i;
-    var githubUrl = 'https://github.com/';
-
-    // build and sort list of issues
-    var issuesList = [];
-    for(i in issues){
-      issuesList.push(issues[i]);
-    }
-    issuesList.sort(function(a, b){
-      return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
-    });
+    var i;
 
     // build list of contributors
     var contributorsList = [];
@@ -226,113 +249,61 @@ module.exports = function(){
     // build list of milestones
     var milestonesList = [];
     for(i in milestones){
+      milestones[i].issues.list.sort(function(a, b){
+        return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
+      });
       milestonesList.push(milestones[i]);
     }
     milestonesList.sort(function(a, b){
-      return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
+      return moment(b.created_at).format('X') - moment(a.created_at).format('X');
     });
 
-    // generate summary
     var startCommit = commits[0];
     var endCommit = commits[commits.length-1];
     var startMoment = moment.unix(startCommit.date.timestamp).zone('UTC');
     var endMoment = moment.unix(endCommit.date.timestamp).zone('UTC');
     var duration = startMoment.from(endMoment, true);
-    log.summary = {
-      commits: {
-        start: {
-          sha: startCommit.sha,
-          shaAbbr: startCommit.shaAbbr,
-          date: startMoment.format("YYYY-MM-DD")
+
+    orphanIssues.sort(function(a, b){
+      return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
+    });
+
+    var data = {
+      repo: repo,
+      symbol: symbol,
+      issues: issues,
+      orphanIssues: orphanIssues,
+      milestonesList: milestonesList,
+      summary : {
+        commits: {
+          start: {
+            sha: startCommit.sha,
+            shaAbbr: startCommit.shaAbbr,
+            date: startMoment.format("YYYY-MM-DD")
+          },
+          end: {
+            sha: endCommit.sha,
+            shaAbbr: endCommit.shaAbbr,
+            date: endMoment.format("YYYY-MM-DD")
+          },
+          total: commits.length,
+          duration: duration,
+          contributors: contributorsList
         },
-        end: {
-          sha: endCommit.sha,
-          shaAbbr: endCommit.shaAbbr,
-          date: endMoment.format("YYYY-MM-DD")
-        },
-        total: commits.length,
-        duration: duration,
-        contributors: contributorsList
-      },
-      issues: {
-        total: issuesList.length,
-        open: issuesSummary.OPEN,
-        closed: issuesSummary.CLOSED
+        issues: {
+          total: Object.keys(issues).length,
+          open: issuesSummary.open,
+          closed: issuesSummary.closed
+        }
       }
     };
-    log.summary.desc = []
-      .concat(log.summary.commits.total)
-      .concat('commits');
-    if(log.summary.issues.total > 0){
-      log.summary.desc = log.summary.desc
-      .concat('against')
-      .concat(log.summary.issues.total)
-      .concat('issues,');
-    }
-    log.summary.desc = log.summary.desc
-      .concat('over')
-      .concat(log.summary.commits.duration)
-      .concat('[`' + log.summary.commits.start.shaAbbr + '`](' + githubUrl + repo + '/commit/' + log.summary.commits.start.shaAbbr + ')')
-      .concat('-')
-      .concat('[`' + log.summary.commits.end.shaAbbr + '`](' + githubUrl + repo + '/commit/' + log.summary.commits.end.shaAbbr + ')');
-    log.summary.desc = log.summary.desc.join(' ');
-    log.summary.release = []
-      .concat('#')
-      .concat(log.summary.commits.start.date)
-      .concat('[**' + repo + '**](' + githubUrl + repo + ')');
-    log.summary.release = log.summary.release.join(' ');
-
-    // log list of issues
-    log.issues = [];
-    issuesList.forEach(function(issue){
-      var line = [];
-      var milestone = '';
-      if(issue.milestone){
-        milestone = ' <sup>[[' + issue.milestone.title + '](' + githubUrl + issue.repo + '/issues?milestone=' + issue.milestone.number + '&state=' + issue.milestone.state + ')]</sup>';
-      }
-      line.push('- [' + issue.state.toUpperCase() + ']');
-      if(issue.foreign){
-        line.push('[**' + issue.key + '**](' + githubUrl + issue.repo + '/issues/' + issue.number + ')');
-      } else {
-        line.push('[**#' + issue.number + '**](' + githubUrl + issue.repo + '/issues/' + issue.number + ')');
-      }
-      line.push(issue.title + milestone);
-      log.issues.push(line.join(' '));
-    });
-
-    // log list of milestones
-    log.milestones = [];
-    milestonesList.forEach(function(milestone){
-      var line = [];
-      line.push('- [' + milestone.state.toUpperCase() + ']');
-      line.push('[**' + milestone.title + '**](' + githubUrl + repo + '/issues?milestone=' + milestone.number + '&state=' + milestone.state + ')');
-      log.milestones.push(line.join(' '));
-    });
-
-    // util.puts(milestonesList);
-    log.summary.milestones = {
-      total: milestonesList.length,
-      open: milestonesSummary.OPEN,
-      closed: milestonesSummary.CLOSED
-    };
-
-    // log of commits
-    log.commits = [];
-    commits.forEach(function(commit){
-      var line = [];
-      // line.push(moment.unix(commit.date.timestamp).zone('UTC').format('YYYY-MM-DD HH:mm'));
-      line.push('- [**#' + commit.shaAbbr + '**](' + githubUrl + repo + '/commit/' + commit.shaAbbr + ')');
-      line.push(commit.subject);
-      line.push('[[' + commit.author + '](' + githubUrl + commit.author + ')]');
-      log.commits.push(line.join(' '));
-    });
-
-    cb(null, log);
+    cb(null, ejs.render(tpl, data) + '\n\n' + existing);
   }
 
   return function generate(range, cb) {
-    setRange(range);
+    // revisionSelection = range || '';
     async.series([
+      setRevision,
       parseRepo,
       parseGitLog,
       fetchIssues
