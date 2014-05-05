@@ -297,7 +297,14 @@ module.exports = function(){
         }
       }
     };
-    cb(null, ejs.render(tpl, data) + '\n\n' + existing);
+
+    if(milestonesList.length || orphanIssues.length){
+      cb(null, ejs.render(tpl, data) + '\n\n' + existing);
+    } else {
+      cb('no changes');
+    }
+
+
   }
 
   return function generate(range, cb) {
