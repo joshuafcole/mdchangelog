@@ -38,9 +38,11 @@ module.exports = function(){
     closed: 0
   };
 
-  function setRevision(cb){
+  function parseExisting(cb){
     if(fs.existsSync('CHANGELOG.md')){
       existing = fs.readFileSync(process.cwd() + '/CHANGELOG.md', 'utf8');
+    }
+    if(!revisionSelection){
       var regex = new RegExp('\\w+\\)' + symbol, 'g');
       var match = regex.exec(existing);
       if(match) {
@@ -308,9 +310,9 @@ module.exports = function(){
   }
 
   return function generate(range, cb) {
-    // revisionSelection = range || '';
+    revisionSelection = range || '';
     async.series([
-      setRevision,
+      parseExisting,
       parseRepo,
       parseGitLog,
       fetchIssues

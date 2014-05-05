@@ -12,6 +12,10 @@ Generate a github oauth token and make it available in your `env` at `MDCHANGELO
 
 Inside of a git repo, run: `mdchangelog`
 
+By default, mdchangelog will prepend to an existing `CHANGELOG.md` using the git sha from the
+last release entry in the file. You can override this behaviour by passing a git
+revision selection: `mdchangelog HEAD...66c248f`
+
 ## Output
 
 Here is an example mdchangelog output for the [hapi](https://github.com/spumko/hapi) git history:
