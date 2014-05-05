@@ -1,4 +1,13 @@
 # 2014-05-05
+2 commits against 1 issues, over 35 minutes [`7d4e29f`](https://github.com/creativelive/mdchangelog/commit/7d4e29f)⎆[`23462a7`](https://github.com/creativelive/mdchangelog/commit/23462a7)
+
+## [**basic markdown changelog**](https://github.com/creativelive/mdchangelog/issues?milestone=1&state=open)
+- [**#7**](https://github.com/creativelive/mdchangelog/issues/7) re-instate git selection override
+
+---
+
+
+# 2014-05-05
 2 commits against 1 issues, over 17 minutes [`76fbf23`](https://github.com/creativelive/mdchangelog/commit/76fbf23)⎆[`723211d`](https://github.com/creativelive/mdchangelog/commit/723211d)
 
 ## Issues
