@@ -3,6 +3,7 @@
 var util = require('util');
 var exec = require('child_process').exec;
 var async = require('async');
+var path = require('path');
 var Chaps = require('chaps');
 var chaps = new Chaps({
   hostname: 'https://api.github.com',
@@ -16,7 +17,7 @@ var fs = require('fs');
 var moment = require('moment-timezone');
 var ejs = require('ejs');
 
-var tpl = fs.readFileSync(__dirname, '/log.ejs', 'utf8');
+var tpl = fs.readFileSync(path.join(__dirname, 'log.ejs'), 'utf8');
 
 module.exports = function() {
   var repo;
@@ -40,7 +41,7 @@ module.exports = function() {
 
   function parseExisting(cb) {
     if (fs.existsSync('CHANGELOG.md')) {
-      existing = fs.readFileSync(process.cwd() + '/CHANGELOG.md', 'utf8');
+      existing = fs.readFileSync(path.join(process.cwd(), 'CHANGELOG.md'), 'utf8');
     }
     if (!revisionSelection) {
       var regex = new RegExp('\\w+\\)' + symbol, 'g');
