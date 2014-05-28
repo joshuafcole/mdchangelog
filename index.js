@@ -1,7 +1,7 @@
 'use strict';
 
 var util = require('util');
-var exec = require('child_process').exec, child;
+var exec = require('child_process').exec;
 var async = require('async');
 var Chaps = require('chaps');
 var chaps = new Chaps({
@@ -16,7 +16,7 @@ var fs = require('fs');
 var moment = require('moment-timezone');
 var ejs = require('ejs');
 
-var tpl = fs.readFileSync(__dirname + '/log.ejs', 'utf8');
+var tpl = fs.readFileSync(__dirname, '/log.ejs', 'utf8');
 
 module.exports = function(){
   var repo;
@@ -46,7 +46,7 @@ module.exports = function(){
       var regex = new RegExp('\\w+\\)' + symbol, 'g');
       var match = regex.exec(existing);
       if(match) {
-        anchor = match[0].substring(0, match[0].length -2);
+        anchor = match[0].substring(0, match[0].length - 2);
       }
       if(anchor){
         revisionSelection = 'HEAD...' + anchor;
@@ -57,7 +57,7 @@ module.exports = function(){
 
   function parseRepo(cb){
     var cmd = 'git config --get remote.origin.url';
-    child = exec(cmd, function (err, stdout, stderr) {
+    exec(cmd, function (err, stdout, stderr) {
       if(err) {
         return cb(err + 'cannot find git remote');
       }
@@ -66,7 +66,7 @@ module.exports = function(){
       }
       var remote = stdout.match(/:[\S+]*.git/g);
       if(remote.length){
-        repo = remote[0].substring(1, (remote[0].length-4));
+        repo = remote[0].substring(1, (remote[0].length - 4));
       }
       if(repo){
         return cb(null, repo);
@@ -79,17 +79,17 @@ module.exports = function(){
     var delim = '----******----';
     var cmd = 'git log --pretty=format:"%H%n%h%n%ad%n%aN%n%s%n%B%n' + delim + '" --date=raw ' + revisionSelection;
     var execOpts = {
-      maxBuffer: 2000*1024,
+      maxBuffer: 2000 * 1024,
       cwd: process.cwd()
     };
-    child = exec(cmd, execOpts, function (err, stdout, stderr) {
+    exec(cmd, execOpts, function (err, stdout, stderr) {
       if(err) {
         return cb(err);
       }
       if(stderr) {
         return cb(stderr);
       }
-      if(stdout===''){
+      if(stdout === ''){
         return cb('no changes');
       }
       // anatomy of a git log entry
@@ -101,7 +101,7 @@ module.exports = function(){
         'subject',
         'body'
       ];
-      var entrySize = entrySignature.length -1;
+      var entrySize = entrySignature.length - 1;
 
       // build the list of commits from the git log
       var commit = {};
@@ -111,7 +111,7 @@ module.exports = function(){
         if(entry === delim){
           line = 0;
           // remove any trailing line return
-          if(commit[sha].body[commit[sha].body.length -1] === ''){
+          if(commit[sha].body[commit[sha].body.length - 1] === ''){
             commit[sha].body.pop();
           }
           // add commit to list of commits
@@ -261,7 +261,7 @@ module.exports = function(){
     });
 
     var startCommit = commits[0];
-    var endCommit = commits[commits.length-1];
+    var endCommit = commits[commits.length -1 ];
     var startMoment = moment.unix(startCommit.date.timestamp).zone('UTC');
     var endMoment = moment.unix(endCommit.date.timestamp).zone('UTC');
     var duration = startMoment.from(endMoment, true);
@@ -305,8 +305,6 @@ module.exports = function(){
     } else {
       cb('no changes');
     }
-
-
   }
 
   return function generate(range, cb) {
