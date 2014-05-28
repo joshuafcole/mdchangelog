@@ -4,7 +4,7 @@
   "description": "markdown github changelog history",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/gulp/bin/gulp.js lint"
   },
   "bin": {
     "mdchangelog": "bin/mdchangelog"
@@ -19,7 +19,14 @@
     "minimist": "0.0.8",
     "ejs": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^3.6.2",
+    "minimist": "^0.1.0",
+    "gulp-jsbeautifier": "0.0.2",
+    "gulp-diff": ">=0.1.4",
+    "confidence": ">=0.12.1",
+    "gulp-eslint": ">=0.1.7"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/creativelive/mdchangelog.git"
