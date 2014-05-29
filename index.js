@@ -267,7 +267,9 @@ function MDChangelog(opts) {
     var milestonesList = [];
     for (i in milestones) {
       milestones[i].issues.list.sort(function(a, b) {
-        return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
+        // multiple issues can be updated at the same time from one commit
+        // so add the issue number to the sort value
+        return (moment(b.updated_at).format('X') + b.number) - (moment(a.updated_at).format('X') + a.number);
       });
       milestonesList.push(milestones[i]);
     }
@@ -282,7 +284,9 @@ function MDChangelog(opts) {
     var duration = startMoment.from(endMoment, true);
 
     orphanIssues.sort(function(a, b) {
-      return moment(b.updated_at).format('X') - moment(a.updated_at).format('X');
+      // multiple issues can be updated at the same time from one commit
+      // so add the issue number to the sort value
+      return (moment(b.updated_at).format('X') + b.number) - (moment(a.updated_at).format('X') + a.number);
     });
 
     var data = {
