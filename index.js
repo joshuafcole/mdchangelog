@@ -30,7 +30,7 @@ function MDChangelog(opts) {
   };
 
   function parseExistingChangelog(cb) {
-    if(opts.overwrite) {
+    if (opts.overwrite) {
       return cb(null);
     }
     var changelogPath = path.join(process.cwd(), 'CHANGELOG.md');
@@ -182,7 +182,7 @@ function MDChangelog(opts) {
       issuesList.push(issues[i]);
     }
 
-    if(issuesList.length){
+    if (issuesList.length) {
       var ProgressBar = require('progress');
       var bar = new ProgressBar('  fetching issues [:bar] :percent :etas', {
         complete: '=',
@@ -314,11 +314,11 @@ function MDChangelog(opts) {
       }
     };
 
-    if(opts['orphan-issues']){
+    if (opts['orphan-issues']) {
       data.orphanIssues = [];
     }
 
-    if(opts.prologue === false) {
+    if (opts.prologue === false) {
       data.prologue = false;
     }
 
