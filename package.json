@@ -13,11 +13,11 @@
   "author": "Matthew Hadley (https://github.com/diffsky)",
   "license": "MIT",
   "dependencies": {
-    "chaps": "^1.2.0",
     "async": "^0.7.0",
     "moment-timezone": "0.0.6",
     "minimist": "0.0.8",
-    "ejs": "^1.0.0"
+    "ejs": "^1.0.0",
+    "chaps": "^2.0.0"
   },
   "devDependencies": {
     "gulp": "^3.6.2",

@@ -206,7 +206,7 @@ function MDChangelog(opts) {
         url: '/repos/' + item.repo + '/issues/' + item.number
       }, function(err, res) {
         if (err || !res.body) {
-          return cb(err);
+          util.error(err);
         }
         // message contains any error
         if (res.body.message) {

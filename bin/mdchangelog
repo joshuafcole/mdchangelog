@@ -26,8 +26,9 @@ if(argv.help){
 if(!process.env.MDCHANGELOG_TOKEN){
   return util.error('Missing github oauth token at env.MDCHANGELOG_TOKEN');
 }
-var changelog = new MDchangelog();
-changelog(argv._[0], function(err, log){
+console.log(argv);
+var changelog = new MDchangelog(argv);
+changelog(function(err, log){
   if(err) {
     return util.error(err);
   }

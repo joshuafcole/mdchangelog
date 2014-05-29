@@ -1,7 +1,9 @@
+<% if(prologue === true){ -%>
 # <%= summary.commits.start.date %>
 <%= summary.commits.total -%> commits against <%= summary.issues.total -%> issues, over <%= summary.commits.duration -%> [`<%= summary.commits.start.shaAbbr -%>`](https://github.com/<%= repo -%>/commit/<%= summary.commits.start.shaAbbr -%>)<%= symbol -%>[`<%= summary.commits.end.shaAbbr -%>`](https://github.com/<%= repo -%>/commit/<%= summary.commits.end.shaAbbr -%>)
-<% milestonesList.forEach(function(milestone){ %>
 
+<% } -%>
+<% milestonesList.forEach(function(milestone){ %>
 ## [**<%= milestone.title -%>**](https://github.com/<%= repo -%>/issues?milestone=<%= milestone.number -%>&state=<%= milestone.state %>)
 <% milestone.issues.list.forEach(function(issue){ %>
 <% if(issue.foreign){ -%>
