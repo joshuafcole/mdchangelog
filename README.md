@@ -21,12 +21,11 @@ mdchangelog HEAD...66c248f
 ```
 
 mdchangelog supports the following flags:
-```
---overwrite overwrite CHANGELOG.md instead of prepending
---no-prologue disables prologue text
---no-orphan-issues ignore issues without a milestone
---timeout <int> timeout value in ms for github requests
-```
+- `--overwrite` overwrite CHANGELOG.md instead of prepending
+- `--no-prologue` disables prologue text
+- `--no-orphan-issues` ignore issues without a milestone
+- `--timeout` <int> timeout value in ms for github requests
+
 
 
 ## Output
