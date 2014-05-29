@@ -1,4 +1,4 @@
-# mdchangelog
+# mdchangelog [![](https://travis-ci.org/creativelive/mdchangelog.png)](https://travis-ci.org/creativelive/mdchangelog)
 
 Generate a markdown changelog from git history, linked to github issues and milestones
 
