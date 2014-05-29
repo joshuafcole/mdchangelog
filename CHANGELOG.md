@@ -1,5 +1,5 @@
 # 2014-05-29
-16 commits against 11 issues, over a month [`a3f9c96`](https://github.com/creativelive/mdchangelog/commit/a3f9c96)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
+17 commits against 11 issues, over a month [`9921215`](https://github.com/creativelive/mdchangelog/commit/9921215)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
 
 ## [**hapi**](https://github.com/creativelive/mdchangelog/issues?milestone=2&state=open)
 - [**#11**](https://github.com/creativelive/mdchangelog/issues/11) Option to drop the prologue
