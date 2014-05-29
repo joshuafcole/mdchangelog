@@ -186,13 +186,13 @@ function MDChangelog(opts) {
 
     if (issuesList.length) {
       var ProgressBar = require('progress');
-      var bar = new ProgressBar('fetching issues [:bar] :percent :etas', {
+      var bar = new ProgressBar('fetching :current/:total issues [:bar] :percent :etas', {
         complete: '=',
         incomplete: ' ',
         width: 20,
         total: issuesList.length
       });
-      process.stdout.write('fetching issues ');
+      process.stdout.write('fetching 0/' + issuesList.length + ' issues ');
     }
     var chaps = new Chaps({
       hostname: 'https://api.github.com',
@@ -203,11 +203,12 @@ function MDChangelog(opts) {
         'User-Agent': 'chalog'
       }
     });
-    async.eachLimit(issuesList, 25, function(item, asyncCb) {
+    async.eachLimit(issuesList, 50, function(item, asyncCb) {
       chaps.get({
         url: '/repos/' + item.repo + '/issues/' + item.number
       }, function(err, res) {
         if (err || !res.body) {
+          console.log('');
           return cb(err);
         }
         // message contains any error
@@ -251,6 +252,10 @@ function MDChangelog(opts) {
         asyncCb();
       });
     }, function(err) {
+      if (bar && !bar.complete) {
+        // send a line end to terminal
+        console.log('');
+      }
       cb(err);
     });
   }
