@@ -1,5 +1,5 @@
 # 2014-05-29
-21 commits against 11 issues, over a month [`bcc38e9`](https://github.com/creativelive/mdchangelog/commit/bcc38e9)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
+24 commits against 11 issues, over a month [`e729acf`](https://github.com/creativelive/mdchangelog/commit/e729acf)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
 
 ## [**hapi**](https://github.com/creativelive/mdchangelog/issues?milestone=2&state=open)
 - [**#11**](https://github.com/creativelive/mdchangelog/issues/11) Option to drop the prologue
@@ -19,4 +19,3 @@
 - [**#5**](https://github.com/creativelive/mdchangelog/issues/5) don&#39;t generate a release if no issues updated
 - [**#1**](https://github.com/creativelive/mdchangelog/issues/1) generate changelog for milestones, issues and (optionally) commits
 
----

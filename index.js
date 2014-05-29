@@ -296,6 +296,7 @@ function MDChangelog(opts) {
 
     var data = {
       prologue: true,
+      anchor: opts.anchor,
       repo: repo,
       symbol: symbol,
       issues: issues,
