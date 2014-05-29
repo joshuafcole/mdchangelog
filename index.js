@@ -192,8 +192,8 @@ function MDChangelog(opts) {
         width: 20,
         total: issuesList.length
       });
+      process.stdout.write('fetching issues ');
     }
-    process.stdout.write('fetching issues ');
     var chaps = new Chaps({
       hostname: 'https://api.github.com',
       cache: false,
