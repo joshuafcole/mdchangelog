@@ -10,15 +10,15 @@
 - [**#<%= issue.key -%>**](https://github.com/<%= issue.repo -%>/issues/<%= issue.number -%>) <%= issue.title -%>
   <% } else { -%>
 - [**#<%= issue.number -%>**](https://github.com/<%= issue.repo -%>/issues/<%= issue.number -%>) <%= issue.title -%>
-<% }})}) -%>
-
+<% }}) %>
+<% }) -%>
 <% if (orphanIssues.length){ %>
+
 ## Issues<% orphanIssues.forEach(function(issue){ %>
 <% if(issue.foreign){ -%>
 - [**#<%= issue.key %>**](https://github.com/<%= issue.repo %>/issues/<%= issue.number %>) <%= issue.title %>
 <% } else { -%>
 - [**#<%= issue.number -%>**](https://github.com/<%= issue.repo %>/issues/<%= issue.number %>) <%= issue.title %>
 <% }}) %>
-<% } -%>
-
+<% } %>
 ---

@@ -1,6 +1,11 @@
 {
   "lint": [
     "!node_modules/**/*.js",
+    "**/*.js",
+    "bin/mdchangelog"
+  ],
+  "beautify": [
+    "!node_modules/**/*.js",
     "**/*.js"
   ]
 }

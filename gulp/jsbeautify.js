@@ -6,7 +6,7 @@ var diffReporter = require('gulp-diff').reporter;
 
 module.exports = function(gulp, conf) {
   gulp.task('js-beautify', function() {
-    var task = gulp.src(conf.build.get('/lint'))
+    var task = gulp.src(conf.build.get('/beautify'))
       .pipe(prettify({
         config: '.jsbeautifyrc',
         mode: 'VERIFY_AND_WRITE'

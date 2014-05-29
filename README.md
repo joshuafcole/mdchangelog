@@ -14,7 +14,20 @@ Inside of a git repo, run: `mdchangelog`
 
 By default, mdchangelog will prepend to an existing `CHANGELOG.md` using the git sha from the
 last release entry in the file. You can override this behaviour by passing a git
-revision selection: `mdchangelog HEAD...66c248f`
+revision selection:
+
+```
+mdchangelog HEAD...66c248f
+```
+
+mdchangelog supports the following flags:
+```
+--overwrite overwrite CHANGELOG.md instead of prepending
+--no-prologue disables prologue text
+--no-orphan-issues ignore issues without a milestone
+--timeout <int> timeout value in ms for github requests
+```
+
 
 ## Output
 

@@ -1,6 +1,5 @@
 'use strict';
 
-var util = require('util');
 var exec = require('child_process').exec;
 var async = require('async');
 var path = require('path');
@@ -28,6 +27,9 @@ function MDChangelog(opts) {
       closed: 0
     }
   };
+
+  // (optional) revision will be first passed value
+  opts.revision = opts._[0];
 
   function parseExistingChangelog(cb) {
     if (opts.overwrite) {
@@ -184,14 +186,14 @@ function MDChangelog(opts) {
 
     if (issuesList.length) {
       var ProgressBar = require('progress');
-      var bar = new ProgressBar('  fetching issues [:bar] :percent :etas', {
+      var bar = new ProgressBar('fetching issues [:bar] :percent :etas', {
         complete: '=',
         incomplete: ' ',
         width: 20,
         total: issuesList.length
       });
     }
-    process.stdout.write('  fetching issues ');
+    process.stdout.write('fetching issues ');
     var chaps = new Chaps({
       hostname: 'https://api.github.com',
       cache: false,
@@ -314,7 +316,7 @@ function MDChangelog(opts) {
       }
     };
 
-    if (opts['orphan-issues']) {
+    if (opts['orphan-issues'] === false) {
       data.orphanIssues = [];
     }
 

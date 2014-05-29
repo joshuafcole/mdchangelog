@@ -1,15 +1,16 @@
 #!/usr/bin/env node
+/*eslint no-process-exit:0 */
 
 'use strict';
 
 var util = require('util');
 var argv = require('minimist')(process.argv.slice(2));
 var fs = require('fs');
-var util = require('util');
 var MDchangelog = require('..');
 
 if(argv.version) {
-  return util.puts(require('../package.json').version);
+  util.puts(require('../package.json').version);
+  process.exit();
 }
 if(argv.help){
   var help = []
@@ -18,20 +19,30 @@ if(argv.help){
     .concat('Generate markdown formatted changelogs for a git revision selection')
     .concat('showing referenced issues and milestones from github')
     .concat('')
-    .concat('example usage:')
+    .concat('usage: (inside of a git repo)')
+    .concat('mdchangelog')
+    .concat('')
+    .concat('for a specific revision selection:')
     .concat('mdchangelog HEAD...66c248f')
-    .concat('');
-  return util.puts(help.join('\n'));
+    .concat('')
+    .concat('options:')
+    .concat('--overwrite overwrite CHANGELOG.md instead of prepending')
+    .concat('--no-prologue disables prologue text')
+    .concat('--no-orphan-issues ignore issues without a milestone')
+    .concat('--timeout <int> timeout value in ms for github requests');
+  util.puts(help.join('\n'));
+  process.exit();
 }
 if(!process.env.MDCHANGELOG_TOKEN){
-  return util.error('Missing github oauth token at env.MDCHANGELOG_TOKEN');
+  util.error('Missing github oauth token at env.MDCHANGELOG_TOKEN');
+  process.exit();
 }
-console.log(argv);
 var changelog = new MDchangelog(argv);
 changelog(function(err, log){
   if(err) {
-    return util.error(err);
+    util.error(err);
+    process.exit(1);
   }
   fs.writeFileSync(process.cwd() + '/CHANGELOG.md', log);
-  util.puts('changelog written');
+  util.puts('CHANGELOG.md written');
 });
