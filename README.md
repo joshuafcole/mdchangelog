@@ -10,7 +10,10 @@ Install via `[sudo] npm i -g mdchangelog`
 
 Generate a github oauth token and make it available in your `env` at `MDCHANGELOG_TOKEN`
 
-Inside of a git repo, run: `mdchangelog`
+Inside of a git repo, run:
+```
+mdchangelog
+```
 
 By default, mdchangelog will prepend to an existing `CHANGELOG.md` using the git sha from the
 last release entry in the file. You can override this behaviour by passing a git
