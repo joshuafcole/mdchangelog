@@ -5,14 +5,13 @@
 
 var util = require('util');
 var argv = require('minimist')(process.argv.slice(2));
-var fs = require('fs');
 var MDchangelog = require('..');
 
 if(argv.version) {
   util.puts(require('../package.json').version);
   process.exit();
 }
-if(argv.help){
+if(argv.help || argv.h || argv['?']){
   var help = []
     .concat('MDchangelog ' + require('../package.json').version)
     .concat('')
@@ -26,10 +25,13 @@ if(argv.help){
     .concat('mdchangelog HEAD...66c248f')
     .concat('')
     .concat('options:')
-    .concat('--overwrite overwrite CHANGELOG.md instead of prepending')
-    .concat('--no-prologue disables prologue text')
+    .concat('--cwd <path> path to git repo')
+    .concat('--regenerate rebuild the entire changelog')
+    .concat('--overwrite overwrite CHANGELOG.md in place, instead of prepending (implies regenerate)')
+    .concat('--no-prologue disable prologue text')
     .concat('--no-orphan-issues ignore issues without a milestone')
-    .concat('--timeout <int> timeout value in ms for github requests');
+    .concat('--timeout <int> timeout value in ms for github requests')
+    .concat('--stdout send output to stdout instead of writing to file (implies regenerate)');
   util.puts(help.join('\n'));
   process.exit();
 }
@@ -43,6 +45,4 @@ changelog(function(err, log){
     util.error('error: ' + err);
     process.exit(1);
   }
-  fs.writeFileSync(process.cwd() + '/CHANGELOG.md', log);
-  util.puts('CHANGELOG.md written');
 });

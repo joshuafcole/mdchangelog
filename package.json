@@ -1,6 +1,6 @@
 {
   "name": "mdchangelog",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "markdown github changelog history",
   "main": "index.js",
   "scripts": {

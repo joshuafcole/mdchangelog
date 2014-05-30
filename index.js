@@ -5,6 +5,7 @@ var async = require('async');
 var path = require('path');
 var Chaps = require('chaps');
 var fs = require('fs');
+var util = require('util');
 var moment = require('moment-timezone');
 var ejs = require('ejs');
 var symbol = '⎆';
@@ -28,14 +29,24 @@ function MDChangelog(opts) {
     }
   };
 
+  // opts.overwrite, opts.stdout implies opts.regenerate
+  if (opts.overwrite || opts.stdout) {
+    opts.regenerate = true;
+  }
+
+  if(opts.cwd) {
+    opts.cwd = path.resolve(process.cwd(), opts.cwd);
+  }
+  opts.cwd = opts.cwd || process.cwd();
+
   // (optional) revision will be first passed value
   opts.revision = opts._[0];
 
   function parseExistingChangelog(cb) {
-    if (opts.overwrite) {
+    if (opts.regenerate) {
       return cb(null);
     }
-    var changelogPath = path.join(process.cwd(), 'CHANGELOG.md');
+    var changelogPath = path.join(opts.cwd, 'CHANGELOG.md');
     if (fs.existsSync(changelogPath)) {
       existingChangelog = fs.readFileSync(changelogPath, 'utf8');
     }
@@ -54,7 +65,7 @@ function MDChangelog(opts) {
 
   function parseRepo(cb) {
     var cmd = 'git config --get remote.origin.url';
-    exec(cmd, function(err, stdout, stderr) {
+    exec(cmd, { cwd: opts.cwd }, function(err, stdout, stderr) {
       if (err) {
         return cb(err + 'cannot find git remote');
       }
@@ -78,7 +89,7 @@ function MDChangelog(opts) {
     var cmd = 'git log --pretty=format:"%H%n%h%n%ad%n%aN%n%s%n%B%n' + delim + '" --date=raw ' + opts.revision;
     var execOpts = {
       maxBuffer: 2000 * 1024,
-      cwd: process.cwd()
+      cwd: opts.cwd
     };
     exec(cmd, execOpts, function(err, stdout, stderr) {
       if (err) {
@@ -184,7 +195,7 @@ function MDChangelog(opts) {
       issuesList.push(issues[i]);
     }
 
-    if (issuesList.length) {
+    if (issuesList.length && !opts.stdout) {
       var ProgressBar = require('progress');
       var bar = new ProgressBar('fetching :current/:total issues [:bar] :percent :etas', {
         complete: '=',
@@ -248,7 +259,9 @@ function MDChangelog(opts) {
           // util.puts('no issue found:', item.key);
           delete issues[item.key];
         }
-        bar.tick();
+        if(bar) {
+          bar.tick();
+        }
         asyncCb();
       });
     }, function(err) {
@@ -336,7 +349,15 @@ function MDChangelog(opts) {
 
     if (milestonesList.length || orphanIssues.length) {
       var tpl = fs.readFileSync(path.join(__dirname, 'log.ejs'), 'utf8');
-      cb(null, ejs.render(tpl, data) + existingChangelog);
+      var output = ejs.render(tpl, data) + existingChangelog;
+
+      if(opts.stdout) {
+        process.stdout.write(output);
+      } else {
+        fs.writeFileSync(path.join(opts.cwd, 'CHANGELOG.md'), output);
+        util.puts('CHANGELOG.md written');
+      }
+      cb(null);
     } else {
       cb('no changes');
     }
