@@ -10,26 +10,24 @@ Install via `[sudo] npm i -g mdchangelog`
 
 Generate a github oauth token and make it available in your `env` at `MDCHANGELOG_TOKEN`
 
-Inside of a git repo, run:
 ```
+Usage: (inside of a git repo)
 mdchangelog
-```
 
-By default, mdchangelog will prepend to an existing `CHANGELOG.md` using the git sha from the
-last release entry in the file. You can override this behaviour by passing a git
-revision selection:
-
-```
+By default, mdchangelog will prepend to an existing `CHANGELOG.md`
+using the git sha from the *last release entry* in the changelog.
+You can override this behaviour by passing a git revision selection:
 mdchangelog HEAD...66c248f
+
+Options:
+--cwd <path> path to git repo, defaults to $PWD
+--regenerate rebuild the entire changelog
+--overwrite overwrite CHANGELOG.md in place, instead of prepending (implies regenerate)
+--no-prologue disable prologue text
+--no-orphan-issues ignore issues without a milestone
+--timeout <int> timeout value in ms for github requests
+--stdout send output to stdout instead of writing to file (implies regenerate)
 ```
-
-mdchangelog supports the following flags:
-- `--overwrite` overwrite CHANGELOG.md instead of prepending
-- `--no-prologue` disables prologue text
-- `--no-orphan-issues` ignore issues without a milestone
-- `--timeout` <int> timeout value in ms for github requests
-
-
 
 ## Output
 
