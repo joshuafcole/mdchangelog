@@ -34,7 +34,7 @@ function MDChangelog(opts) {
     opts.regenerate = true;
   }
 
-  if(opts.cwd) {
+  if (opts.cwd) {
     opts.cwd = path.resolve(process.cwd(), opts.cwd);
   }
   opts.cwd = opts.cwd || process.cwd();
@@ -65,7 +65,9 @@ function MDChangelog(opts) {
 
   function parseRepo(cb) {
     var cmd = 'git config --get remote.origin.url';
-    exec(cmd, { cwd: opts.cwd }, function(err, stdout, stderr) {
+    exec(cmd, {
+      cwd: opts.cwd
+    }, function(err, stdout, stderr) {
       if (err) {
         return cb(err + 'cannot find git remote');
       }
@@ -259,7 +261,7 @@ function MDChangelog(opts) {
           // util.puts('no issue found:', item.key);
           delete issues[item.key];
         }
-        if(bar) {
+        if (bar) {
           bar.tick();
         }
         asyncCb();
@@ -351,7 +353,7 @@ function MDChangelog(opts) {
       var tpl = fs.readFileSync(path.join(__dirname, 'log.ejs'), 'utf8');
       var output = ejs.render(tpl, data) + existingChangelog;
 
-      if(opts.stdout) {
+      if (opts.stdout) {
         process.stdout.write(output);
       } else {
         fs.writeFileSync(path.join(opts.cwd, 'CHANGELOG.md'), output);
