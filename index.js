@@ -64,7 +64,7 @@ function MDChangelog(opts) {
   }
 
   function parseRepo(cb) {
-    if(opts.remote) {
+    if (opts.remote) {
       repo = opts.remote;
       return cb();
     }
@@ -291,7 +291,7 @@ function MDChangelog(opts) {
     var milestonesList = [];
     for (i in milestones) {
       milestones[i].issues.list.sort(function(a, b) {
-        if(opts['order-numeric']){
+        if (opts['order-numeric']) {
           return (b.number - a.number);
         }
         // multiple issues can be updated at the same time from one commit
@@ -301,7 +301,7 @@ function MDChangelog(opts) {
       milestonesList.push(milestones[i]);
     }
     milestonesList.sort(function(a, b) {
-      if(opts['order-numeric']){
+      if (opts['order-numeric']) {
         return (b.number - a.number);
       }
       return moment(b.created_at).format('X') - moment(a.created_at).format('X');
@@ -314,7 +314,7 @@ function MDChangelog(opts) {
     var duration = startMoment.from(endMoment, true);
 
     orphanIssues.sort(function(a, b) {
-      if(opts['order-numeric']){
+      if (opts['order-numeric']) {
         return (b.number - a.number);
       }
       // multiple issues can be updated at the same time from one commit
