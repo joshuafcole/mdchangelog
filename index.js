@@ -64,6 +64,10 @@ function MDChangelog(opts) {
   }
 
   function parseRepo(cb) {
+    if(opts.remote) {
+      repo = opts.remote;
+      return cb();
+    }
     var cmd = 'git config --get remote.origin.url';
     exec(cmd, {
       cwd: opts.cwd
@@ -210,7 +214,7 @@ function MDChangelog(opts) {
     var chaps = new Chaps({
       hostname: 'https://api.github.com',
       cache: false,
-      timeout: opts.timeout || 2000,
+      timeout: opts.timeout || 10000,
       headers: {
         Authorization: 'token ' + process.env.MDCHANGELOG_TOKEN,
         'User-Agent': 'chalog'
@@ -287,6 +291,9 @@ function MDChangelog(opts) {
     var milestonesList = [];
     for (i in milestones) {
       milestones[i].issues.list.sort(function(a, b) {
+        if(opts['order-numeric']){
+          return (b.number - a.number);
+        }
         // multiple issues can be updated at the same time from one commit
         // so add the issue number to the sort value
         return (moment(b.updated_at).format('X') + b.number) - (moment(a.updated_at).format('X') + a.number);
@@ -294,6 +301,9 @@ function MDChangelog(opts) {
       milestonesList.push(milestones[i]);
     }
     milestonesList.sort(function(a, b) {
+      if(opts['order-numeric']){
+        return (b.number - a.number);
+      }
       return moment(b.created_at).format('X') - moment(a.created_at).format('X');
     });
 
@@ -304,6 +314,9 @@ function MDChangelog(opts) {
     var duration = startMoment.from(endMoment, true);
 
     orphanIssues.sort(function(a, b) {
+      if(opts['order-numeric']){
+        return (b.number - a.number);
+      }
       // multiple issues can be updated at the same time from one commit
       // so add the issue number to the sort value
       return (moment(b.updated_at).format('X') + b.number) - (moment(a.updated_at).format('X') + a.number);
