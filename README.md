@@ -26,8 +26,10 @@ Options:
 --no-prologue disable prologue text
 --no-orphan-issues ignore issues without a milestone
 --timeout <int> timeout value in ms for github requests
---order <order> order issues & milestones by one of [number,opened_at,updated_at,closed_at]
---reverse reverse the order above
+--order-issues <order> order issues by one of [number,opened_at,updated_at,closed_at]
+--reverse-issues reverse the order of issues
+--order-milestones <order> order issues by one of [number,opened_at,updated_at,title,semver]
+--reverse-milestones reverse the ordering of milestones
 --remote <github/repo> override git config remote repo to pull issues from
 --stdout send output to stdout instead of writing to file (implies regenerate)
 ```
