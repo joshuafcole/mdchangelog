@@ -1,5 +1,5 @@
-# 2014-05-30
-28 commits against 11 issues, over a month [`c3b478f`](https://github.com/creativelive/mdchangelog/commit/c3b478f)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
+# 2014-06-12
+34 commits against 11 issues, over a month [`efee2f3`](https://github.com/creativelive/mdchangelog/commit/efee2f3)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
 
 ## [**hapi**](https://github.com/creativelive/mdchangelog/issues?milestone=2&state=open)
 - [**#11**](https://github.com/creativelive/mdchangelog/issues/11) Option to drop the prologue
@@ -9,9 +9,9 @@
 
 ## [**basic markdown changelog**](https://github.com/creativelive/mdchangelog/issues?milestone=1&state=open)
 - [**#4**](https://github.com/creativelive/mdchangelog/issues/4) use templating for log construction
-- [**#3**](https://github.com/creativelive/mdchangelog/issues/3) group issues by milestone
 - [**#7**](https://github.com/creativelive/mdchangelog/issues/7) re-instate git selection override
 - [**#2**](https://github.com/creativelive/mdchangelog/issues/2) sort milestones by recently updated
+- [**#3**](https://github.com/creativelive/mdchangelog/issues/3) group issues by milestone
 
 
 ## Issues

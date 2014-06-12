@@ -9,6 +9,12 @@ var util = require('util');
 var moment = require('moment-timezone');
 var ejs = require('ejs');
 var symbol = '⎆';
+var validOrders = {
+  number: true,
+  opened_at: true,
+  updated_at: true,
+  closed_at: true
+};
 
 function MDChangelog(opts) {
   var existingChangelog = '';
@@ -236,10 +242,11 @@ function MDChangelog(opts) {
         }
         // populate issue info
         if (res.body.title) {
-
           issues[item.key].title = res.body.title;
           issues[item.key].state = res.body.state;
+          issues[item.key].created_at = res.body.created_at;
           issues[item.key].updated_at = res.body.updated_at;
+          issues[item.key].closed_at = res.body.closed_at;
           summary.issues[issues[item.key].state]++;
 
           if (res.body.milestone) {
@@ -251,7 +258,9 @@ function MDChangelog(opts) {
                 closed: res.body.milestone.closed_issues
               },
               state: res.body.milestone.state,
-              created_at: res.body.milestone.created_at
+              created_at: res.body.milestone.created_at,
+              updated_at: res.body.milestone.updated_at,
+              closed_at: res.body.milestone.closed_at
             };
             milestones[res.body.milestone.number].issues.list = milestones[res.body.milestone.number].issues.list || [];
             milestones[res.body.milestone.number].issues.list.push(issues[item.key]);
@@ -291,20 +300,31 @@ function MDChangelog(opts) {
     var milestonesList = [];
     for (i in milestones) {
       milestones[i].issues.list.sort(function(a, b) {
-        if (opts['order-numeric']) {
-          return (b.number - a.number);
+        var val = [b, a];
+        if (opts.reverse) {
+          val = [a, b];
+        }
+        if (opts.order === 'number') {
+          return (val[0].number - val[1].number);
         }
         // multiple issues can be updated at the same time from one commit
         // so add the issue number to the sort value
-        return (moment(b.updated_at).format('X') + b.number) - (moment(a.updated_at).format('X') + a.number);
+        // Use number to catch nulls (such as ordering by closed_at when
+        // the items is not actually closed)
+        return ((Number(moment(val[0][opts.order]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts.order]).format('X')) || 0) + val[1].number);
       });
       milestonesList.push(milestones[i]);
     }
     milestonesList.sort(function(a, b) {
-      if (opts['order-numeric']) {
-        return (b.number - a.number);
+      var val = [b, a];
+      if (opts.reverse) {
+        val = [a, b];
       }
-      return moment(b.created_at).format('X') - moment(a.created_at).format('X');
+      if (opts.order === 'number') {
+        return (val[0].number - val[1].number);
+      }
+      // see milestone/issue ordering explanation
+      return ((Number(moment(val[0][opts.order]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts.order]).format('X')) || 0) + val[1].number);
     });
 
     var startCommit = commits[0];
@@ -314,12 +334,15 @@ function MDChangelog(opts) {
     var duration = startMoment.from(endMoment, true);
 
     orphanIssues.sort(function(a, b) {
-      if (opts['order-numeric']) {
-        return (b.number - a.number);
+      var val = [b, a];
+      if (opts.reverse) {
+        val = [a, b];
       }
-      // multiple issues can be updated at the same time from one commit
-      // so add the issue number to the sort value
-      return (moment(b.updated_at).format('X') + b.number) - (moment(a.updated_at).format('X') + a.number);
+      if (opts.order === 'number') {
+        return (val[0].number - val[1].number);
+      }
+      // see milestone/issue ordering explanation
+      return ((Number(moment(val[0][opts.order]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts.order]).format('X')) || 0) + val[1].number);
     });
 
     var data = {
@@ -379,6 +402,12 @@ function MDChangelog(opts) {
   }
 
   return function generate(cb) {
+    opts.order = opts.order || 'updated_at';
+    if (opts.order) {
+      if (!validOrders[opts.order]) {
+        return cb('invalid order: "' + opts.order + '", must be one of: ' + Object.keys(validOrders));
+      }
+    }
     async.series([
       parseExistingChangelog,
       parseRepo,

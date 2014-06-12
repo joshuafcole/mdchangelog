@@ -25,8 +25,9 @@ Options:
 --overwrite overwrite CHANGELOG.md in place, instead of prepending (implies regenerate)
 --no-prologue disable prologue text
 --no-orphan-issues ignore issues without a milestone
---timeout <int> timeout value in ms for github requests (defaults to 10secs)
---order-numeric order issues & milestones by number instead of last updated
+--timeout <int> timeout value in ms for github requests
+--order <order> order issues & milestones by one of [number,opened_at,updated_at,closed_at]
+--reverse reverse the order above
 --remote <github/repo> override git config remote repo to pull issues from
 --stdout send output to stdout instead of writing to file (implies regenerate)
 ```
