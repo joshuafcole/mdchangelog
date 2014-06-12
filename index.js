@@ -244,8 +244,16 @@ function MDChangelog(opts) {
           console.log('');
           return cb(err);
         }
-        // message contains any error
+        // body.message will contain any error
         if (res.body.message) {
+          if(res.headers['x-ratelimit-remaining'] === '0'){
+            var now = moment().utc().format('X');
+            var reset = res.headers['x-ratelimit-reset'];
+            var when = reset - now;
+            return asyncCb(res.body.message + ' Rate limit will be reset in ' + moment.duration(when, 'seconds').humanize());
+          }
+          // don't fret about missing issues (a git commit may have
+          // references a non-existent issue
           if (res.body.message !== 'Not Found') {
             return asyncCb(res.body.message);
           }
@@ -341,7 +349,16 @@ function MDChangelog(opts) {
             v.semver = '0.0.0';
           }
         });
-        return semver.gt(val[0].semver, val[1].semver);
+        if(semver.gt(val[0].semver, val[1].semver)){
+          return 1;
+        }
+        if(semver.lt(val[0].semver, val[1].semver)){
+          return -1;
+        }
+        return 0;
+        // // console.log(val[0].semver, val[1].semver)
+        // console.log(semver.gt(val[0].semver, val[1].semver));
+        // return 0;
       }
 
       if (opts['order-milestones'] === 'title') {

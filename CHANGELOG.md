@@ -1,5 +1,5 @@
 # 2014-06-12
-38 commits against 14 issues, over a month [`fe66e9c`](https://github.com/creativelive/mdchangelog/commit/fe66e9c)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
+39 commits against 14 issues, over a month [`a461a6a`](https://github.com/creativelive/mdchangelog/commit/a461a6a)⎆[`886ba42`](https://github.com/creativelive/mdchangelog/commit/886ba42)
 
 ## [**0.16.0**](https://github.com/creativelive/mdchangelog/issues?milestone=6&state=open)
 - [**#17**](https://github.com/creativelive/mdchangelog/issues/17) sample issue 33
