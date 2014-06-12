@@ -246,7 +246,7 @@ function MDChangelog(opts) {
         }
         // body.message will contain any error
         if (res.body.message) {
-          if(res.headers['x-ratelimit-remaining'] === '0'){
+          if (res.headers['x-ratelimit-remaining'] === '0') {
             var now = moment().utc().format('X');
             var reset = res.headers['x-ratelimit-reset'];
             var when = reset - now;
@@ -343,16 +343,16 @@ function MDChangelog(opts) {
         return (val[0].number - val[1].number);
       }
       if (opts['order-milestones'] === 'semver') {
-        val.forEach(function(v){
+        val.forEach(function(v) {
           v.semver = v.title;
-          if(!semver.valid(v.semver)) {
+          if (!semver.valid(v.semver)) {
             v.semver = '0.0.0';
           }
         });
-        if(semver.gt(val[0].semver, val[1].semver)){
+        if (semver.gt(val[0].semver, val[1].semver)) {
           return 1;
         }
-        if(semver.lt(val[0].semver, val[1].semver)){
+        if (semver.lt(val[0].semver, val[1].semver)) {
           return -1;
         }
         return 0;
