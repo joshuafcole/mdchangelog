@@ -7,13 +7,23 @@ var Chaps = require('chaps');
 var fs = require('fs');
 var util = require('util');
 var moment = require('moment-timezone');
+var semver = require('semver');
 var ejs = require('ejs');
 var symbol = '⎆';
 var validOrders = {
-  number: true,
-  opened_at: true,
-  updated_at: true,
-  closed_at: true
+  issues: {
+    number: true,
+    opened_at: true,
+    updated_at: true,
+    closed_at: true
+  },
+  milestones: {
+    number: true,
+    opened_at: true,
+    updated_at: true,
+    title: true,
+    semver: true
+  }
 };
 
 function MDChangelog(opts) {
@@ -301,30 +311,44 @@ function MDChangelog(opts) {
     for (i in milestones) {
       milestones[i].issues.list.sort(function(a, b) {
         var val = [b, a];
-        if (opts.reverse) {
+        if (opts['reverse-issues']) {
           val = [a, b];
         }
-        if (opts.order === 'number') {
+        if (opts['order-issues'] === 'number') {
           return (val[0].number - val[1].number);
         }
         // multiple issues can be updated at the same time from one commit
         // so add the issue number to the sort value
         // Use number to catch nulls (such as ordering by closed_at when
         // the items is not actually closed)
-        return ((Number(moment(val[0][opts.order]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts.order]).format('X')) || 0) + val[1].number);
+        return ((Number(moment(val[0][opts['order-issues']]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts['order-issues']]).format('X')) || 0) + val[1].number);
       });
       milestonesList.push(milestones[i]);
     }
+
     milestonesList.sort(function(a, b) {
       var val = [b, a];
-      if (opts.reverse) {
+      if (opts['reverse-milestones']) {
         val = [a, b];
       }
-      if (opts.order === 'number') {
+      if (opts['order-milestones'] === 'number') {
         return (val[0].number - val[1].number);
       }
+      if (opts['order-milestones'] === 'semver') {
+        val.forEach(function(v){
+          v.semver = v.title;
+          if(!semver.valid(v.semver)) {
+            v.semver = '0.0.0';
+          }
+        });
+        return semver.gt(val[0].semver, val[1].semver);
+      }
+
+      if (opts['order-milestones'] === 'title') {
+        return val[0].title.localeCompare(val[1].title);
+      }
       // see milestone/issue ordering explanation
-      return ((Number(moment(val[0][opts.order]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts.order]).format('X')) || 0) + val[1].number);
+      return ((Number(moment(val[0][opts['order-milestones']]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts['order-milestones']]).format('X')) || 0) + val[1].number);
     });
 
     var startCommit = commits[0];
@@ -338,11 +362,11 @@ function MDChangelog(opts) {
       if (opts.reverse) {
         val = [a, b];
       }
-      if (opts.order === 'number') {
+      if (opts['order-issues'] === 'number') {
         return (val[0].number - val[1].number);
       }
       // see milestone/issue ordering explanation
-      return ((Number(moment(val[0][opts.order]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts.order]).format('X')) || 0) + val[1].number);
+      return ((Number(moment(val[0][opts['order-issues']]).format('X')) || 0) + val[0].number) - ((Number(moment(val[1][opts['order-issues']]).format('X')) || 0) + val[1].number);
     });
 
     var data = {
@@ -402,12 +426,16 @@ function MDChangelog(opts) {
   }
 
   return function generate(cb) {
-    opts.order = opts.order || 'updated_at';
-    if (opts.order) {
-      if (!validOrders[opts.order]) {
-        return cb('invalid order: "' + opts.order + '", must be one of: ' + Object.keys(validOrders));
-      }
+    opts['order-issues'] = opts['order-issues'] || 'updated_at';
+    opts['order-milestones'] = opts['order-milestones'] || 'updated_at';
+
+    if (!validOrders.issues[opts['order-issues']]) {
+      return cb('invalid order: "' + opts['order-issues'] + '", must be one of: ' + Object.keys(validOrders.issues));
     }
+    if (!validOrders.milestones[opts['order-milestones']]) {
+      return cb('invalid order: "' + opts['order-milestones'] + '", must be one of: ' + Object.keys(validOrders.milestones));
+    }
+
     async.series([
       parseExistingChangelog,
       parseRepo,

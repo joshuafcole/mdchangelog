@@ -33,8 +33,10 @@ if(argv.help || argv.h || argv['?']){
     .concat('--no-prologue disable prologue text')
     .concat('--no-orphan-issues ignore issues without a milestone')
     .concat('--timeout <int> timeout value in ms for github requests')
-    .concat('--order <order> order issues & milestones by one of [number,opened_at,updated_at,closed_at]')
-    .concat('--reverse reverse the order above')
+    .concat('--order-issues <order> order issues by one of [number,opened_at,updated_at,closed_at]')
+    .concat('--reverse-issues reverse the order of issues')
+    .concat('--order-milestones <order> order issues by one of [number,opened_at,updated_at,title,semver]')
+    .concat('--reverse-milestones reverse the ordering of milestones')
     .concat('--remote <github/repo> override git config remote repo to pull issues from')
     .concat('--stdout send output to stdout instead of writing to file (implies regenerate)');
   util.puts(help.join('\n'));

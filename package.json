@@ -1,6 +1,6 @@
 {
   "name": "mdchangelog",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "markdown github changelog history",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,8 @@
     "moment-timezone": "0.0.6",
     "minimist": "0.0.8",
     "ejs": "^1.0.0",
-    "chaps": "^2.0.0"
+    "chaps": "^2.0.0",
+    "semver": "^2.3.0"
   },
   "devDependencies": {
     "gulp": "^3.6.2",
